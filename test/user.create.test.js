@@ -43,7 +43,7 @@ describe('UC201 Registreren als nieuwe user', () => {
         done()
     })
 
-    it.skip('TC-201-3 Niet-valide password', (done) => {
+    it('TC-201-3 Niet-valide password', (done) => {
         // Implement this test case to validate the password field
         chai.request(server)
             .post(endpointToTest)
@@ -55,7 +55,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             })
             .end((err, res) => {
                 chai.expect(res).to.have.status(400)
-                chai.expect(res.body).to.have.property('message').equals('Password must contain at least one uppercase letter, one digit, and be at least 8 characters long')
+                chai.expect(res.body).to.have.property('message').equals('Invalid user data')
                 done()
             })
     })
