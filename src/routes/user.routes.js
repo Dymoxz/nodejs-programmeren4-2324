@@ -18,15 +18,61 @@ const notFound = (req, res, next) => {
 
 // Input validation functions for user routes
 const validateUserCreate = (req, res, next) => {
-    if (!req.body.emailAdress || !req.body.firstName || !req.body.lastName) {
-        next({
+    try {
+        const {
+            firstName,
+            lastName,
+            emailAdress,
+            password
+        } = req.body;
+
+        assert.ok(firstName, 'firstName should not be empty');
+        assert.strictEqual(
+            typeof firstName,
+            'string',
+            'firstName should be a string'
+        );
+
+        assert.ok(lastName, 'lastName should not be empty');
+        assert.strictEqual(
+            typeof lastName,
+            'string',
+            'lastName should be a string'
+        );
+
+        assert.ok(emailAdress, 'emailAddress should not be empty');
+        assert.strictEqual(
+            typeof emailAdress,
+            'string',
+            'emailAddress should be a string'
+        );
+        assert.ok(
+            /^[a-zA-Z]{1}[.]{1}[a-zA-Z]{2,}@[a-zA-Z]{2,}\.[a-zA-Z]{2,3}$/.test(
+                emailAdress
+            ),
+            'emailAddress should match the pattern'
+        );
+
+        assert.ok(password, 'password should not be empty');
+        assert.strictEqual(
+            typeof password,
+            'string',
+            'password should be a string'
+        );
+        assert.ok(
+            /^(?=.*[A-Z])(?=.*[0-9]).{8,}$/.test(password),
+            'password should match the pattern'
+        );
+        // Move to the next middleware if validation passes
+        next();
+    } catch (err) {
+        return res.status(400).json({
             status: 400,
-            message: 'Missing email or password',
-            data: {}
-        })
+            message: 'Invalid user data',
+            error: err.toString(),
+        });
     }
-    next()
-}
+};
 
 
 // Input validation function using Chai for POST /api/user
@@ -79,7 +125,7 @@ const checkEmailUniqueness = async (email) => {
 
 
 // Userroutes
-router.post('/api/user', validateUserCreateChaiExpect, userController.create)
+router.post('/api/user', validateUserCreate, userController.create)
 router.get('/api/user', userController.getAll)
 router.get('/api/user/:userId', userController.getById)
 
