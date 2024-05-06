@@ -10,18 +10,11 @@ tracer.setLevel('warn')
 const endpointToTest = '/api/user'
 
 describe('UC201 Registreren als nieuwe user', () => {
-    /**
-     * Voorbeeld van een beforeEach functie.
-     * Hiermee kun je code hergebruiken of initialiseren.
-     */
     beforeEach((done) => {
         console.log('Before each test')
         done()
     })
 
-    /**
-     * Hier starten de testcases
-     */
     it('TC-201-1 Verplicht veld ontbreekt', (done) => {
         chai.request(server)
             .post(endpointToTest)
@@ -31,11 +24,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 emailAdress: 'v.a@server.nl'
             })
             .end((err, res) => {
-                /**
-                 * Voorbeeld uitwerking met chai.expect
-                 */
                 chai.expect(res).to.have.status(400)
-                chai.expect(res).not.to.have.status(200)
                 chai.expect(res.body).to.be.a('object')
                 chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
@@ -55,16 +44,24 @@ describe('UC201 Registreren als nieuwe user', () => {
     })
 
     it.skip('TC-201-3 Niet-valide password', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
+        // Implement this test case to validate the password field
+        chai.request(server)
+            .post(endpointToTest)
+            .send({
+                firstName: 'Voornaam',
+                lastName: 'Achternaam',
+                emailAdress: 'v.a@server.nl',
+                password: 'weakpassword' // Password doesn't meet requirements
+            })
+            .end((err, res) => {
+                chai.expect(res).to.have.status(400)
+                chai.expect(res.body).to.have.property('message').equals('Password must contain at least one uppercase letter, one digit, and be at least 8 characters long')
+                done()
+            })
     })
 
     it.skip('TC-201-4 Gebruiker bestaat al', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
+        // Implement this test case
         done()
     })
 
@@ -74,7 +71,8 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'v.a@server.nl'
+                emailAdress: 'v.a@server.nl',
+                password: 'StrongPassword123' // Valid password
             })
             .end((err, res) => {
                 res.should.have.status(200)
