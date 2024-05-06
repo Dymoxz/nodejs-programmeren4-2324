@@ -21,7 +21,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 // firstName: 'Voornaam', ontbreekt
                 lastName: 'Achternaam',
-                emailAdress: 'v.a@server.nl',
+                emailAdress: 'v.aaa@server.nl',
                 password: 'WeakPassword123' // Adding a password field
             })
             .end((err, res) => {
@@ -50,7 +50,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'v.a@server.nl',
+                emailAdress: 'v.aaa@server.nl',
                 password: 'weakpassword' // Password doesn't meet requirements
             })
             .end((err, res) => {
