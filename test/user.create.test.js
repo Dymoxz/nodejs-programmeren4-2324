@@ -30,11 +30,9 @@ describe('UC201 Registreren als nieuwe user', () => {
                 chai.expect(res.body).to.have.property('status').equals(400)
                 chai.expect(res.body)
                     .to.have.property('message')
-                    .equals('Missing or incorrect firstName field')
+                    .equals('Invalid user data')
 
-                chai.expect(res.body)
-                    .to.have.property('data')
-                    .that.is.a('object').that.is.empty
+                chai.expect(res.body).to.not.have.property('data')
 
                 done()
             })
@@ -73,7 +71,7 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 firstName: 'Voornaam',
                 lastName: 'Achternaam',
-                emailAdress: 'v.a@server.nl',
+                emailAdress: 'v.aaa@server.nl',
                 password: 'StrongPassword123' // Valid password
             })
             .end((err, res) => {
