@@ -87,12 +87,27 @@ describe('UC201 Registreren als nieuwe user', () => {
             });
     });
 
-    it.skip('TC-201-4 Gebruiker bestaat al', (done) => {
-        //
-        // Hier schrijf je jouw testcase.
-        //
-        done()
-    })
+    it('TC-201-4 Gebruiker bestaat al', (done) => {
+        // Simuleer een bestaande gebruiker
+        const existingUser = {
+            firstName: 'Hendrik',
+            lastName: 'van Dam',
+            emailAdress: 'hvd@server.nl'
+        };
+
+        // Maak een POST-verzoek om dezelfde gebruiker opnieuw te registreren
+        chai.request(server)
+            .post(endpointToTest)
+            .send(existingUser)
+            .end((err, res) => {
+                chai.expect(res).to.have.status(409); // Verwacht een 'Conflict' status
+                chai.expect(res.body).to.be.a('object');
+                chai.expect(res.body).to.have.property('status').equals(409);
+                chai.expect(res.body).to.have.property('message').equals('User already exists');
+                chai.expect(res.body).to.have.property('data').that.is.a('object').that.is.empty;
+                done();
+            });
+    });
 
     it('TC-201-5 Gebruiker succesvol geregistreerd', (done) => {
         chai.request(server)
