@@ -21,7 +21,8 @@ describe('UC201 Registreren als nieuwe user', () => {
             .send({
                 // firstName: 'Voornaam', ontbreekt
                 lastName: 'Achternaam',
-                emailAdress: 'v.a@server.nl'
+                emailAdress: 'v.a@server.nl',
+                password: 'WeakPassword123' // Adding a password field
             })
             .end((err, res) => {
                 chai.expect(res).to.have.status(400)
@@ -30,14 +31,15 @@ describe('UC201 Registreren als nieuwe user', () => {
                 chai.expect(res.body)
                     .to.have.property('message')
                     .equals('Missing or incorrect firstName field')
-                chai
-                    .expect(res.body)
+
+                chai.expect(res.body)
                     .to.have.property('data')
                     .that.is.a('object').that.is.empty
 
                 done()
             })
     })
+
 
     it.skip('TC-201-2 Niet-valide email adres', (done) => {
         done()
@@ -75,7 +77,7 @@ describe('UC201 Registreren als nieuwe user', () => {
                 password: 'StrongPassword123' // Valid password
             })
             .end((err, res) => {
-                res.should.have.status(200)
+                res.should.have.status(200) // Expecting status code 200 for successful registration
                 res.body.should.be.a('object')
 
                 res.body.should.have.property('data').that.is.a('object')
