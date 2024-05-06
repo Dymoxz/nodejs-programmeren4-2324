@@ -92,7 +92,8 @@ describe('UC201 Registreren als nieuwe user', () => {
         const existingUser = {
             firstName: 'Hendrik',
             lastName: 'van Dam',
-            emailAdress: 'hvd@server.nl'
+            emailAdress: 'hvd@server.nl',
+            password: "Welkom1"
         };
 
         // Maak een POST-verzoek om dezelfde gebruiker opnieuw te registreren
