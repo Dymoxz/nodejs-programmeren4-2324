@@ -12,14 +12,16 @@ const database = {
             id: 0,
             firstName: 'Hendrik',
             lastName: 'van Dam',
-            emailAdress: 'hvd@server.nl'
+            emailAdress: 'h.vndma@server.nl',
+            password: "Welkaaaom1"
             // Hier de overige velden uit het functioneel ontwerp
         },
         {
             id: 1,
             firstName: 'Marieke',
             lastName: 'Jansen',
-            emailAdress: 'm@server.nl'
+            emailAdress: 'm.jnse@server.nl',
+            password: "Vaarweeeol2"
             // Hier de overige velden uit het functioneel ontwerp
         }
     ],
