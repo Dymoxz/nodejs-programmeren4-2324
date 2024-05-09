@@ -1,29 +1,86 @@
-// Get the client
 const mysql = require('mysql2')
+const logger = require('../../src/util/logger')
+require('dotenv').config()
 
-// Create the connection to database
-const connection = mysql.createConnection({
-    host: 'localhost',
+// Set the log level to the value of the LOG_LEVEL environment variable
+// Only here to show how to set the log level
+const tracer = require('tracer')
+tracer.setLevel(process.env.LOG_LEVEL)
+
+// Hier worden de db connection settings opgehaald uit de .env file
+const dbConfig = {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     user: 'root',
-    database: 'share-a-meal'
+    password: process.env.DB_PASSWORD,
+    database: 'share-a-meal',
+
+    connectionLimit: 10,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+    multipleStatements: true
+}
+
+logger.trace(dbConfig)
+
+// Hier wordt de pool aangemaakt
+const pool = mysql.createPool(dbConfig)
+
+//
+// Hier worden de events van de pool gelogd, zodat je kunt zien wat er gebeurt
+//
+pool.on('connection', function (connection) {
+    logger.trace(
+        `Connected to database '${connection.config.database}' on '${connection.config.host}:${connection.config.port}'`
+    )
 })
 
-// A simple SELECT query, without placeholders/prepared statements
-connection.query(
-    'SELECT name, description FROM `meal` WHERE `isActive` = 1',
-    function (err, results, fields) {
-        console.log(results) // results contains rows returned by server
-        console.log(fields) // fields contains extra meta data about results, if available
-    }
-)
+pool.on('acquire', function (connection) {
+    logger.trace('Connection %d acquired', connection.threadId)
+})
 
-// Using placeholders, prepared statements
-connection.query(
-    'SELECT * FROM `user` WHERE `firstName` = ? AND `id` > ?',
-    ['Herman', 1],
-    function (err, results) {
-        console.log(results)
-    }
-)
+pool.on('release', function (connection) {
+    logger.trace('Connection %d released', connection.threadId)
+})
 
-connection.end()
+// Hier wordt de query gedefinieerd met behulp van ? placeholders (prepared statement)
+queryString = 'SELECT * FROM `user` WHERE `firstName` = ? AND `id` > ?'
+name = 'Herman'
+isActive = 1
+
+// use the pool to get one connection from the pool
+pool.getConnection(function (err, connection) {
+    if (err) {
+        logger.error(err)
+        // in je server: next(err)!
+        return 1 // exit the program, alleen hier omdat het een voorbeeld is
+    }
+
+    // Use the connection to execute a query
+    connection.query(
+        queryString,
+        [name, isActive],
+        function (error, results, fields) {
+            // When done with the connection, release it.
+            connection.release()
+
+            // Handle error after the release.
+            if (error) {
+                logger.error(error)
+                // in je server: next(err)!
+                return 1 // exit the program, alleen hier omdat het een voorbeeld is
+            }
+
+            // Don't use the connection here, it has been returned to the pool.
+            logger.debug('#results = ', results.length)
+            logger.debug({
+                statusCode: 200,
+                results: results
+            })
+        }
+    )
+})
+
+// Export the pool, so that testcases can use it
+module.exports = pool
