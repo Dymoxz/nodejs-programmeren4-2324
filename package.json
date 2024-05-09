@@ -25,6 +25,8 @@
     },
     "dependencies": {
         "express": "^4.19.2",
+        "mysql": "^2.18.1",
+        "mysql2": "^3.9.7",
         "tracer": "^1.3.0"
     },
     "devDependencies": {
