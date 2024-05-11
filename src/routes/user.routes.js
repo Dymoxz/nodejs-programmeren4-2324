@@ -5,6 +5,7 @@ chai.should()
 const router = express.Router()
 const userController = require('../controllers/user.controller')
 const logger = require('../util/logger')
+const validateToken = require('./authentication.routes').validateToken
 const database = require('../dao/inmem-db')
 
 // Tijdelijke functie om niet bestaande routes op te vangen
@@ -213,7 +214,9 @@ const checkEmailUniqueness = async (email) => {
 // Userroutes
 router.post('/api/user', validateUserCreate, userController.create)
 router.get('/api/user', userController.getAll)
+router.get('/api/user/profile', validateToken, userController.getProfile)
 router.get('/api/user/:userId', userController.getById)
+
 
 // Tijdelijke routes om niet bestaande routes op te vangen
 router.put('/api/user/:userId',validateUserUpdate, userController.update)
