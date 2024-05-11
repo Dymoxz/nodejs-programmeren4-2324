@@ -1,37 +1,66 @@
-const database = require('../dao/inmem-db')
+const database = require('../dao/mysql-db')
 const logger = require('../util/logger')
 
 const userService = {
     create: (user, callback) => {
-        logger.info('create user', user)
-        database.add(user, (err, data) => {
+        logger.info('create user', user);
+
+        database.getConnection(function (err, connection) {
             if (err) {
-                logger.info(
-                    'error creating user: ',
-                    err.message || 'unknown error'
-                )
-                callback(err, null)
-            } else {
-                logger.trace(`User created with id ${data.id}.`)
-                callback(null, {
-                    message: `User created with id ${data.id}.`,
-                    data: data
-                })
+                logger.error(err);
+                callback(err, null);
+                return;
             }
-        })
+
+            const { firstName, lastName, isActive, emailAddress, password, phoneNumber, roles, street, city } = user;
+
+            connection.query(
+                'INSERT INTO user (firstName, lastName, isActive, emailAddress, password, phoneNumber, roles, street, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                [firstName, lastName, isActive, emailAddress, password, phoneNumber, roles, street, city],
+                function (error, results, fields) {
+                    connection.release();
+
+                    if (error) {
+                        logger.error('error creating user:', error.message || 'unknown error');
+                        callback(error, null);
+                    } else {
+                        logger.trace('User created.');
+                        callback(null, {
+                            message: 'User created.',
+                            data: results
+                        });
+                    }
+                }
+            );
+        });
     },
 
     getAll: (callback) => {
         logger.info('getAll')
-        database.getAll((err, data) => {
+        database.getConnection(function (err, connection) {
             if (err) {
+                logger.error(err)
                 callback(err, null)
-            } else {
-                callback(null, {
-                    message: `Found ${data.length} users.`,
-                    data: data
-                })
+                return
             }
+
+            connection.query(
+                'SELECT * FROM `user`',
+                function (error, results, fields) {
+                    connection.release()
+
+                    if (error) {
+                        logger.error(error)
+                        callback(error, null)
+                    } else {
+                        logger.debug(results)
+                        callback(null, {
+                            message: `Found ${results.length} users.`,
+                            data: results
+                        })
+                    }
+                }
+            )
         })
     },
 
