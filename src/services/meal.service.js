@@ -173,4 +173,4 @@ const mealService = {
 
 
 }
-module.exports = mealServicex
+module.exports = mealService
