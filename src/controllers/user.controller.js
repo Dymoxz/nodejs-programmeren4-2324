@@ -24,23 +24,25 @@ let userController = {
     },
 
     getAll: (req, res, next) => {
-        logger.trace('getAll')
-        userService.getAll((error, success) => {
+        logger.trace('getAll');
+        const { isActive, field2 } = req.query;
+
+        userService.getAll(isActive, field2, (error, success) => {
             if (error) {
                 return next({
                     status: error.status,
                     message: error.message,
                     data: {}
-                })
+                });
             }
             if (success) {
                 res.status(200).json({
                     status: 200,
                     message: success.message,
                     data: success.data
-                })
+                });
             }
-        })
+        });
     },
 
     getById: (req, res, next) => {

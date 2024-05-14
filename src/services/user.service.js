@@ -35,34 +35,50 @@ const userService = {
         });
     },
 
-    getAll: (callback) => {
-        logger.info('getAll')
+    getAll: (isActive, field2, callback) => {
+        logger.info('getAll');
+
+        // Construct the query with optional filters
+        let query = 'SELECT * FROM `user`';
+        let queryParams = [];
+
+        if (isActive || field2) {
+            query += ' WHERE';
+            if (isActive) {
+                query += ' isActive = ?';
+                queryParams.push(isActive);
+            }
+            if (field2) {
+                if (isActive) query += ' AND';
+                query += ' field2 = ?';
+                queryParams.push(field2);
+            }
+        }
+
         database.getConnection(function (err, connection) {
             if (err) {
-                logger.error(err)
-                callback(err, null)
-                return
+                logger.error(err);
+                callback(err, null);
+                return;
             }
 
-            connection.query(
-                'SELECT * FROM `user`',
-                function (error, results, fields) {
-                    connection.release()
+            connection.query(query, queryParams, function (error, results, fields) {
+                connection.release();
 
-                    if (error) {
-                        logger.error(error)
-                        callback(error, null)
-                    } else {
-                        logger.debug(results)
-                        callback(null, {
-                            message: `Found ${results.length} users.`,
-                            data: results
-                        })
-                    }
+                if (error) {
+                    logger.error(error);
+                    callback(error, null);
+                } else {
+                    logger.debug(results);
+                    callback(null, {
+                        message: `Found ${results.length} users.`,
+                        data: results
+                    });
                 }
-            )
-        })
+            });
+        });
     },
+
 
     getById: (userId, callback) => {
         logger.info('getById');
