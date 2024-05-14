@@ -67,7 +67,7 @@ describe('UC202 Opvragen van overzicht van users', () => {
     it('TC-202-3 Toon gebruikers met zoekterm op isActive=false', (done) => {
         chai
             .request(server)
-            .get(`${endpointToTest}?isActive=false}`)
+            .get(`${endpointToTest}?isActive=0}`)
             .set('Authorization', `Bearer ${authToken}`)
             .send({})
             .end((err, res) => {
@@ -81,7 +81,7 @@ describe('UC202 Opvragen van overzicht van users', () => {
     it('TC-202-4 Toon gebruikers met zoekterm op isActive=true', (done) => {
         chai
             .request(server)
-            .get(`${endpointToTest}?isActive=true}`)
+            .get(`${endpointToTest}?isActive=1}`)
             .set('Authorization', `Bearer ${authToken}`)
             .send({})
             .end((err, res) => {
