@@ -15,7 +15,7 @@ describe('UC101 Inloggen', () => {
         done();
     });
 
-    it('TC-101-1 Verplicht veld ontbreekt - missing emailAdress', (done) => {
+    it('TC-101-1 Verplicht veld ontbreekt', (done) => {
         chai.request(server)
             .post(endpointToTest)
             .send({

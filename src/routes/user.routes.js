@@ -16,8 +16,6 @@ const notFound = (req, res, next) => {
         data: {}
     })
 }
-
-// Input validation functions for user routes
 const validateUserCreate = async (req, res, next) => {
     try {
         const {
@@ -41,6 +39,8 @@ const validateUserCreate = async (req, res, next) => {
             'lastName should be a string'
         );
 
+        // Check if emailAdress field is missing
+        assert.ok(emailAdress !== undefined, 'emailAdress is required');
         assert.ok(emailAdress, 'emailAddress should not be empty');
         assert.strictEqual(
             typeof emailAdress,
@@ -76,7 +76,7 @@ const validateUserCreate = async (req, res, next) => {
     } catch (err) {
         return res.status(400).json({
             status: 400,
-            message: 'Invalid user data',
+            message: err.message, // Return the specific error message
             error: err.toString(),
         });
     }

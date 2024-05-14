@@ -5,6 +5,9 @@ const userService = {
     create: (user, callback) => {
         logger.info('create user', user);
 
+        const { firstName, lastName, emailAdress, password } = user;
+
+        // Check if the email address already exists
         database.getConnection(function (err, connection) {
             if (err) {
                 logger.error(err);
@@ -12,28 +15,68 @@ const userService = {
                 return;
             }
 
-            const { firstName, lastName, isActive, emailAddress, password, phoneNumber, roles, street, city } = user;
-
             connection.query(
-                'INSERT INTO user (firstName, lastName, isActive, emailAddress, password, phoneNumber, roles, street, city) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                [firstName, lastName, isActive, emailAddress, password, phoneNumber, roles, street, city],
+                'SELECT * FROM user WHERE emailAdress = ?',
+                [emailAdress],
                 function (error, results, fields) {
                     connection.release();
 
                     if (error) {
-                        logger.error('error creating user:', error.message || 'unknown error');
+                        logger.error('Error checking duplicate email:', error.message || 'unknown error');
                         callback(error, null);
                     } else {
-                        logger.trace('User created.');
-                        callback(null, {
-                            message: 'User created.',
-                            data: results
-                        });
+                        // If the email already exists, return an error with status 400
+                        if (results.length > 0) {
+                            const duplicateError = new Error('User with this email address already exists');
+                            logger.error(duplicateError.message);
+                            callback({
+                                status: 400,
+                                message: 'User already exists.',
+                                data: {}
+                            }, null);
+                        } else {
+                            // If the email is unique, proceed with user creation
+                            const sql = `INSERT INTO user (firstName, lastName, emailAdress, password) VALUES (?, ?, ?, ?)`;
+                            const values = [firstName, lastName, emailAdress, password];
+
+                            database.getConnection(function (err, connection) {
+                                if (err) {
+                                    logger.error(err);
+                                    callback(err, null);
+                                    return;
+                                }
+
+                                connection.query(sql, values, function (error, results, fields) {
+                                    connection.release();
+
+                                    if (error) {
+                                        logger.error('error creating user:', error.message || 'unknown error');
+                                        callback(error, null);
+                                    } else {
+                                        logger.trace('User created.');
+                                        // Include the firstName in the response
+                                        callback(null, {
+                                            message: 'User created.',
+                                            data: {
+                                                firstName: firstName, // Include the firstName property
+                                                lastName: lastName,
+                                                emailAdress: emailAdress,
+                                                id: results.insertId // Assuming id is returned after insertion
+                                            }
+                                        });
+                                    }
+                                });
+                            });
+                        }
                     }
                 }
             );
         });
     },
+
+
+
+
 
     getAll: (isActive, field2, callback) => {
         logger.info('getAll');
