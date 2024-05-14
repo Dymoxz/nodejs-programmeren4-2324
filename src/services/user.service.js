@@ -123,34 +123,60 @@ const userService = {
     },
 
 
-    getById: (userId, callback) => {
+    getById: (userId, creatorId, callback) => {
         logger.info('getById');
         database.getConnection(function (err, connection) {
             if (err) {
-                logger.error(err)
-                callback(err, null)
-                return
+                logger.error(err);
+                callback(err, null);
+                return;
             }
 
             connection.query(
-                'SELECT * FROM `user` WHERE id = ?',
-                id = userId,
-                function (error, results, fields) {
-                    connection.release()
+                'SELECT id, emailAdress, firstName, lastName, phoneNumber, password FROM `user` WHERE id = ?',
+                [userId],
+                function (error, resultsUser, fields) {
+                    connection.release();
 
                     if (error) {
-                        logger.error(error)
-                        callback(error, null)
+                        logger.error(error);
+                        callback(error, null);
                     } else {
-                        logger.debug(results)
-                        callback(null, {
-                            message: `Found user.`,
-                            data: results
-                        })
+                        logger.debug(resultsUser);
+                        userId = parseInt(userId, 10);
+                        creatorId = parseInt(creatorId, 10);
+                        if (resultsUser && resultsUser.length > 0) {
+                            if (userId !== creatorId) {
+                                resultsUser[0].password = undefined;
+                            }
+                            connection.query(
+                                'SELECT id, name, description FROM `meal` WHERE cookId = ?',
+                                [userId],
+                                function (error, resultsMeal, fields) {
+                                    connection.release();
+
+                                    if (error) {
+                                        logger.error(error);
+                                        callback(error, null);
+                                    } else {
+                                        logger.debug(resultsMeal);
+                                        callback(null, {
+                                            message: `Found ${resultsUser.length} user.`,
+                                            data: [resultsUser, resultsMeal],
+                                        });
+                                    }
+                                }
+                            );
+                        } else {
+                            const errorMessage = `User met ID ${userId} bestaat niet`;
+                            const errorObject = new Error(errorMessage);
+                            errorObject.status = 404;
+                            callback(errorObject, null);
+                        }
                     }
                 }
-            )
-        })
+            );
+        });
     },
 
     update: (userId, user, callback) => {

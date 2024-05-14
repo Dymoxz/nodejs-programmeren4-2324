@@ -46,25 +46,25 @@ let userController = {
     },
 
     getById: (req, res, next) => {
-        const userId = req.params.userId
-        logger.trace('userController: getById', userId)
-        userService.getById(userId, (error, success) => {
+        const userId = req.params.userId;
+        logger.trace('userController: getById', userId);
+        userService.getById(userId, null, (error, result) => {
             if (error) {
-                return next({
-                    status: error.status,
-                    message: error.message,
-                    data: {}
-                })
-            }
-            if (success) {
+                next({
+                    status: error.status || 500, // Default to 500 if status is not defined
+                    message: error.message || 'Internal Server Error', // Default error message
+                    data: {} // Empty data object
+                });
+            } else {
                 res.status(200).json({
-                    status: success.status,
-                    message: success.message,
-                    data: success.data
-                })
+                    status: 200,
+                    message: result.message || 'Success', // Default success message
+                    data: result.data || {} // Default empty data object
+                });
             }
-        })
+        });
     },
+
 
     update: (req, res, next) => {
         const userId = req.params.userId;
