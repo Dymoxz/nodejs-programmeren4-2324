@@ -73,4 +73,26 @@ describe('UC101 Inloggen', () => {
                 done();
             });
     });
+
+    it('TC-101-4 Gebruiker succesvol ingelogd', (done) => {
+        chai.request(server)
+            .post(endpointToTest)
+            .send({
+                emailAdress: 'm.vandullemen@server.nl',
+                password: 'secret'
+            })
+            .end((err, res) => {
+                console.log('Response body:', res.body);  // Log response body for debugging
+                console.log('Response status:', res.status);  // Log status code for debugging
+
+                chai.expect(res).to.have.status(200);  // Expecting 200 status code
+                chai.expect(res.body).to.be.a('object');
+                chai.expect(res.body).to.have.property('status').equals(200);
+                chai.expect(res.body).to.have.property('message').equals('User logged in');
+                chai.expect(res.body).to.have.property('data').that.includes.keys('id', 'emailAdress', 'firstName', 'lastName', 'token');
+
+                done();
+            });
+    });
+
 });
