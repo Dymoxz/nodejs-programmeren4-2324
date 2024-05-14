@@ -1,6 +1,6 @@
 # Nodejs Programmeren 4 Express server
 
-Hier komt een korte introductie.
+Dit is het eindproject voor programmeren-4. (Jaar 1, Avans Hogeschool Breda). In deze repository bevind zich een NodeJS server voor het "share-a-meal" systeem. Deze server maakt gebruik van express en heeft functionaliteiten zoals inloggen, account aanmaken, maaltijden maken etc.
 
 ## Installing
 
